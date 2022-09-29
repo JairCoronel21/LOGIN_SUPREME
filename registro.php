@@ -1,37 +1,47 @@
 <?php
-	
+	// traer los elementos necesarios 
 	require 'database/conexion.php';
-	require 'funciones/funcs.php';
+	require 'controller/funcs.php';
 	
 	$errors = array();
+
+	// iniciar el metodo post
 	
 	if(!empty($_POST)) {
-      
+		// Declarando las variables
+       // real_scape nos ayuda a  limpiar la cadena y tener el formulario seguro
+	   // con los elemntos nombrados en html
         $nombre = $mysqli->real_escape_string($_POST['nombre']);
 		$usuario = $mysqli->real_escape_string($_POST['usuario']);
 		$password = $mysqli->real_escape_string($_POST['password']);
 		$con_password = $mysqli->real_escape_string($_POST['con_password']);
 		$email= $mysqli->real_escape_string($_POST['email']);
+		// se genera un nuevo elemnto captha 
 		$captcha= $mysqli->real_escape_string($_POST['g-recaptcha-response']);
-
-		$activo = 0;
+        // por defecto es estado del usuario es inactivo
+		$activo = 1;
+		//tipo de usuario normal
+		//privilegio de usurio normal
 		$tipo_usuario = 2;
+		// clave secreta del captha
 		$secret = '6Lcv7akhAAAAAAFVsKn1L8JpGwt3gBlk2lseul9J';
         
-
+        // validacion de la cpatha 
         if(!$captcha) {
             $errors[] = "Por favor verifica el captcha";
         }
-    
+        
+		// validar lod datos en require html
         if(isNull($nombre, $usuario, $password, $con_password, $email)) {
             $errors[] = "Debe llenar todos los campos";
         }
 
-
+        // llama a la funcion para validar email
         if(!isEmail($email)) {
             $errors[] = "Direccion de correo invalida";
         }
-
+        
+		// validar el password 
         if(!validaPassword($password, $con_password)) {
             $errors[] = "Las contraseñas no coinciden";
 
@@ -47,22 +57,27 @@
             $errors[] = "El correo electronico $email ya existe";
         }
 
-
+            // validar los errores contabilizados
         if(count($errors) == 0) {
+			// esto para validar el captha 
             $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secret&response=$captcha");
 
-
+             // recibir el json
             $arr = json_decode($response, TRUE);
 
+			//empezar a registrar al usuario
             if($arr['success']) {
+				// cifrar la contraseña 
                 $pass_hash = hashPassword($password);
+				// generar token de entrada 
                 $token = generateToken();
 
 
-				
+				// si se cumple se ingrsan los datos de las variables 
+				//llama a la función
                 $registro = registraUsuario($usuario, $pass_hash, $nombre, $email,
                 $activo, $token, $tipo_usuario);
-
+                  
                 if($registro > 0) {
                    
                     $url = 'http://'.$_SERVER["SERVER_NAME"].
@@ -112,23 +127,16 @@
 		<link rel="stylesheet" href="css/bootstrap-theme.min.css" >
 		
         <script type="text/javascript">
-			document.onkeydown = function(){return false};
-					$(document).onkeydown(function (event) { // lee el teclado
-		if (event.keyCode == 123) { // si preciona F12
-			return false;
-		} else if (event.ctrlKey && event.shiftKey && event.keyCode == 73) { // si preciona Ctrl+Shift+I        
-			return false;
-		}else if(event.ctrlKey  && event.keyCode == 85){ // si preciona Ctr+u
-			return false;
-		}
+		    document.onkeydown=function (e){
+        var currKey=0,evt=e||window.event;
+        currKey=evt.keyCode||evt.which||evt.charCode;
+        if (currKey == 123) {
+            window.event.cancelBubble = true;
+            window.event.returnValue = false;
+        }
+    }
 
-		});  
-
-		$(document).mousedown(function(e) { // lee el mouse
-		if (e.which == 3) {
-			alert('Esta opción no está dispuesta, lo sentimos. '); // si preciona el click derecho del mouse
-		}
-		});
+         
 		</script>
 		<script src="js/bootstrap.min.js" ></script>
 		<script src='https://www.google.com/recaptcha/api.js'></script>
@@ -186,6 +194,7 @@
 									<input type="email" class="form-control" name="email" placeholder="Email" value="<?php if(isset($email)) echo $email; ?>" required>
 								</div>
 							</div>
+
 							
 							<div class="form-group">
 								<label for="captcha" class="col-md-3 control-label"></label>

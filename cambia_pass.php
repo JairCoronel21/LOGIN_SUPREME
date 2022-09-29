@@ -1,7 +1,7 @@
 <?php
-	
-	require 'funcs/conexion.php';
-	require 'funcs/funcs.php';
+	require 'database/conexion.php';
+	require 'controller/funcs.php';
+
 	
 	if(empty($_GET['user_id'])) {
 		header('Location: index.php');
@@ -10,15 +10,15 @@
 	if(empty($_GET['token'])) {
 		header('Location: index.php');
 	}
-
+    
 	$user_id = $mysqli->real_escape_string($_GET['user_id']);
 	$token = $mysqli->real_escape_string($_GET['token']);
-
+    
     if (!verificaTokenPass($user_id, $token)) {
 		echo 'No se pudo verificar los datos';
 		exit;
 	}
-
+    
 
 ?>
 

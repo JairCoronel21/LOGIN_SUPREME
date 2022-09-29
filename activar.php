@@ -1,7 +1,7 @@
 <?php
 
         require 'database/conexion.php';
-        require 'funciones/funcs.php';
+        require 'controller/funcs.php';
 
 
         if(isset($_GET["id"]) and isset($_GET["val"])) {

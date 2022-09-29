@@ -1,7 +1,6 @@
 <?php
-	
-	require 'funcs/conexion.php';
-	require 'funcs/funcs.php';
+	require 'database/conexion.php';
+	require 'controller/funcs.php';
 	
 	$user_id = $mysqli->real_escape_string($_POST['user_id']);
 	$token = $mysqli->real_escape_string($_POST['token']);

@@ -2,7 +2,9 @@
 
 	
         require 'database/conexion.php';
-        require 'funciones/funcs.php';
+        require 'controller/funcs.php';
+         
+		
 
 
         $errors = array();
@@ -22,13 +24,13 @@
 
             if(emailExiste($email)) {
                  
-                $user_id = getValor('id', 'correo', $email);
-                $nombre = getValor('nombre', 'correo', $email);
+                $user_id = getValor('id', 'email', $email);
+                $nombre = getValor('name', 'email', $email);
 
                 $token = generaTokenPass($user_id);
 
                 $url = 'http://'.$_SERVER["SERVER_NAME"].
-				'/LOGIN_SUPREME/cambia_pass.php?user_id='.$user_id.'&token='.$token;
+				'/LOGIN_SUPREME/cambia_pass.php?user_id=?'.$user_id.$token;
 
                 $asunto = 'Recuperar Password - Sistema de Usuarios';
                 $cuerpo = "Hola $nombre: <br /><br />Se ha solicitado 
